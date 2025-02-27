@@ -21,60 +21,42 @@ MongoClient.connect(MONGO_URL)
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static(path.join(__dirname, "public")));
 
-// **1️⃣ Alle Reisen abrufen**
+// Alle Reisen abrufen (nur Reiseinformationen)
 app.get('/reisen', async (req, res) => {
     try {
-        const reisen = await db.collection("reisen").find().toArray();
+        const reisen = await db.collection("reisen").find({}, { projection: { reisenummer: 1, reisebezeichnung: 1, abreiseOrt: 1, ankunftsOrt: 1 } }).toArray();
         res.json(reisen);
     } catch (error) {
         res.status(500).json({ error: "Fehler beim Abrufen der Reisen" });
     }
 });
 
-// **2️⃣ Alle Reiseteilnehmer abrufen**
-app.get('/teilnehmer', async (req, res) => {
+// Kunden und deren gewähltes Reiseangebot basierend auf der Reisenummer abrufen
+app.get('/reisen/:nummer/kunden', async (req, res) => {
     try {
-        const reisen = await db.collection("reisen").find().toArray();
-        const teilnehmer = reisen.flatMap(reise =>
-            reise.reiseangebot?.flatMap(angebot =>
-                angebot.kundenListe?.kunde ?? []
-            ) ?? []
+        const { nummer } = req.params;
+        const reise = await db.collection("reisen").findOne({ reisenummer: nummer });
+        if (!reise) {
+            return res.status(404).json({ error: "Reise nicht gefunden" });
+        }
+
+        const kunden = reise.reiseangebot.flatMap(angebot =>
+            angebot.kundenListe?.kunde.map(kunde => ({
+                ...kunde,
+                angebot: angebot.angebotbezeichnung
+            })) ?? []
         );
-        res.json(teilnehmer);
+
+        res.json(kunden);
     } catch (error) {
-        res.status(500).json({ error: "Fehler beim Abrufen der Reiseteilnehmer" });
+        res.status(500).json({ error: "Fehler beim Abrufen der Kunden" });
     }
 });
 
-// **3️⃣ Reisen nach Zielort filtern**
-app.get('/reisen/ort/:ort', async (req, res) => {
-    try {
-        const { ort } = req.params;
-        const reisen = await db.collection("reisen").find({ ankunftsOrt: ort }).toArray();
-        res.json(reisen);
-    } catch (error) {
-        res.status(500).json({ error: "Fehler beim Abrufen der Reisen nach Ort" });
-    }
-});
-
-// **4️⃣ Reiseangebote mit Preisfilter**
-app.get('/angebote/preis/:maxPreis', async (req, res) => {
-    try {
-        const maxPreis = parseInt(req.params.maxPreis, 10);
-        const reisen = await db.collection("reisen").find().toArray();
-        const angebote = reisen.flatMap(reise =>
-            reise.reiseangebot?.filter(angebot => parseInt(angebot.preis, 10) <= maxPreis) ?? []
-        );
-        res.json(angebote);
-    } catch (error) {
-        res.status(500).json({ error: "Fehler beim Abrufen der Angebote nach Preis" });
-    }
-});
-
-// **Frontend ausliefern**
+// Frontend ausliefern
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// **Server starten**
+// Server starten
 app.listen(PORT, () => console.log(`🚀 Server läuft auf http://localhost:${PORT}`));

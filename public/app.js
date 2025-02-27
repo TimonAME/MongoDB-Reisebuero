@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchReisen();
 });
 
-// Reisen & Teilnehmer abrufen und anzeigen
+// Reisen abrufen und anzeigen
 function fetchReisen() {
     fetch("/reisen")
         .then(response => response.json())
@@ -23,31 +23,29 @@ function fetchReisen() {
                 `;
                 container.appendChild(card);
 
-                fetchTeilnehmer(reise.reiseangebot, `teilnehmer-${reise.reisenummer}`);
+                fetchKunden(reise.reisenummer, `teilnehmer-${reise.reisenummer}`);
             });
         })
         .catch(error => console.error("Fehler beim Laden der Reisen:", error));
 }
 
-// Teilnehmer für eine bestimmte Reise abrufen
-function fetchTeilnehmer(reiseangebote, listId) {
-    const teilnehmerList = document.getElementById(listId);
-    teilnehmerList.innerHTML = "";
+// Kunden für eine bestimmte Reise abrufen
+function fetchKunden(reisenummer, listId) {
+    fetch(`/reisen/${reisenummer}/kunden`)
+        .then(response => response.json())
+        .then(data => {
+            const teilnehmerList = document.getElementById(listId);
+            teilnehmerList.innerHTML = "";
 
-    let teilnehmer = [];
-    reiseangebote.forEach(angebot => {
-        if (angebot.kundenListe && Array.isArray(angebot.kundenListe.kunde)) {
-            teilnehmer.push(...angebot.kundenListe.kunde);
-        }
-    });
-
-    if (teilnehmer.length === 0) {
-        teilnehmerList.innerHTML = "<li>Keine Teilnehmer</li>";
-    } else {
-        teilnehmer.forEach(person => {
-            const li = document.createElement("li");
-            li.textContent = `${person.Vorname} ${person.Nachname}`;
-            teilnehmerList.appendChild(li);
-        });
-    }
+            if (data.length === 0) {
+                teilnehmerList.innerHTML = "<li>Keine Teilnehmer</li>";
+            } else {
+                data.forEach(person => {
+                    const li = document.createElement("li");
+                    li.textContent = `${person.Vorname} ${person.Nachname} (${person.angebot})`;
+                    teilnehmerList.appendChild(li);
+                });
+            }
+        })
+        .catch(error => console.error("Fehler beim Laden der Kunden:", error));
 }
