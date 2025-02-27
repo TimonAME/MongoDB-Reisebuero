@@ -8,8 +8,9 @@ function fetchReisen() {
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById("reisen-container");
-            container.innerHTML = ""; // Alte Inhalte löschen
+            container.innerHTML = "";
 
+            // jede reise bearbeiten und kunden dieser reise fetchen
             data.forEach(reise => {
                 const card = document.createElement("div");
                 card.classList.add("reise-card");
@@ -40,6 +41,7 @@ function fetchKunden(reisenummer, listId) {
             if (data.length === 0) {
                 teilnehmerList.innerHTML = "<li>Keine Teilnehmer</li>";
             } else {
+                // alle kunden in das html schreiben mit ganzen namen und gewähltes angebot
                 data.forEach(person => {
                     const li = document.createElement("li");
                     li.textContent = `${person.Vorname} ${person.Nachname} (${person.angebot})`;

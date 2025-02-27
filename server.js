@@ -16,7 +16,7 @@ MongoClient.connect(MONGO_URL)
         db = client.db(DB_NAME);
         console.log(`✅ Verbunden mit MongoDB (${DB_NAME})`);
     })
-    .catch(err => console.error("❌ Fehler bei der Verbindung zu MongoDB:", err));
+    .catch(err => console.error("Fehler bei der Verbindung zu MongoDB:", err));
 
 // Statische Dateien aus dem "public"-Ordner bereitstellen
 app.use(express.static(path.join(__dirname, "public")));
@@ -59,4 +59,4 @@ app.get("/", (req, res) => {
 });
 
 // Server starten
-app.listen(PORT, () => console.log(`🚀 Server läuft auf http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server läuft auf http://localhost:${PORT}`));
