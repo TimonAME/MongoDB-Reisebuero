@@ -24,7 +24,14 @@ app.use(express.static(path.join(__dirname, "public")));
 // Alle Reisen abrufen (nur Reiseinformationen)
 app.get('/reisen', async (req, res) => {
     try {
-        const reisen = await db.collection("reisen").find({}, { projection: { reisenummer: 1, reisebezeichnung: 1, abreiseOrt: 1, ankunftsOrt: 1 } }).toArray();
+        const reisen = await db.collection("reisen").find({}, {
+            projection: {
+                reisenummer: 1,
+                reisebezeichnung: 1,
+                abreiseOrt: 1,
+                ankunftsOrt: 1
+            }
+        }).toArray();
         res.json(reisen);
     } catch (error) {
         res.status(500).json({ error: "Fehler beim Abrufen der Reisen" });
@@ -35,20 +42,43 @@ app.get('/reisen', async (req, res) => {
 app.get('/reisen/:nummer/kunden', async (req, res) => {
     try {
         const { nummer } = req.params;
+
+        // Reise mit angegebener Nummer finden
         const reise = await db.collection("reisen").findOne({ reisenummer: nummer });
         if (!reise) {
             return res.status(404).json({ error: "Reise nicht gefunden" });
         }
 
-        const kunden = reise.reiseangebot.flatMap(angebot =>
-            angebot.kundenListe?.kunde.map(kunde => ({
-                ...kunde,
-                angebot: angebot.angebotbezeichnung
-            })) ?? []
-        );
+        // Alle Angebot-IDs dieser Reise extrahieren
+        const angebotIDs = reise.reiseangebot.map(angebot => angebot.angebotID);
 
-        res.json(kunden);
+        // Alle Kunden finden, die mindestens eines dieser Angebote gebucht haben
+        const kunden = await db.collection("kunden").find({
+            angebotIDs: { $in: angebotIDs }
+        }).toArray();
+
+        // Die Kundenliste im für das Frontend erwarteten Format aufbereiten
+        const kundenMitAngebote = [];
+
+        kunden.forEach(kunde => {
+            // Nur die Angebote berücksichtigen, die zu dieser Reise gehören
+            const relevantOffers = kunde.angebotIDs.filter(id => angebotIDs.includes(id));
+
+            relevantOffers.forEach(angebotID => {
+                const angebot = reise.reiseangebot.find(ang => ang.angebotID === angebotID);
+                if (angebot) {
+                    kundenMitAngebote.push({
+                        Vorname: kunde.Vorname,
+                        Nachname: kunde.Nachname,
+                        angebot: angebot.angebotbezeichnung
+                    });
+                }
+            });
+        });
+
+        res.json(kundenMitAngebote);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Fehler beim Abrufen der Kunden" });
     }
 });

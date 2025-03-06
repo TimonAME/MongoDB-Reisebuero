@@ -1,0 +1,90 @@
+[
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed4"
+    },
+    "Vorname": "Daniel",
+    "Nachname": "Hofmann",
+    "angebotIDs": ["1-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed5"
+    },
+    "Vorname": "Tobias",
+    "Nachname": "Inführ",
+    "angebotIDs": ["1-1", "2-2"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed6"
+    },
+    "Vorname": "Demir",
+    "Nachname": "Kupinic",
+    "angebotIDs": ["1-2"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed7"
+    },
+    "Vorname": "Filip",
+    "Nachname": "Coja",
+    "angebotIDs": ["1-2", "5-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed8"
+    },
+    "Vorname": "Felix",
+    "Nachname": "Berger",
+    "angebotIDs": ["2-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ed9"
+    },
+    "Vorname": "Oliver",
+    "Nachname": "Kubesch",
+    "angebotIDs": ["2-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2eda"
+    },
+    "Vorname": "Daniel",
+    "Nachname": "Kisling",
+    "angebotIDs": ["2-2"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2edb"
+    },
+    "Vorname": "Rafael",
+    "Nachname": "Fiedler",
+    "angebotIDs": ["2-2", "3-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2edc"
+    },
+    "Vorname": "Max",
+    "Nachname": "Mayer",
+    "angebotIDs": ["3-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2edd"
+    },
+    "Vorname": "Sophie",
+    "Nachname": "Schmidt",
+    "angebotIDs": ["4-1"]
+  },
+  {
+    "_id": {
+      "$oid": "67c05f66869e31f6430f2ede"
+    },
+    "Vorname": "Luca",
+    "Nachname": "Weber",
+    "angebotIDs": ["5-1"]
+  }
+]
