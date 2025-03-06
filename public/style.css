@@ -13,33 +13,100 @@ header {
     padding: 1rem;
 }
 
-main {
-    width: 90%;
-    max-width: 800px;
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 95%;
+    max-width: 1600px;
     margin: 20px auto;
+    gap: 20px;
 }
 
-.reise-card {
+.column {
+    flex: 1;
+    min-width: 300px;
+}
+
+.column h2 {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+main {
+    width: 100%;
+    margin: 0;
+}
+
+.reise-card, .kunde-card {
     background: white;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    transition: transform 0.2s;
 }
 
-.reise-card h3 {
+.reise-card:hover, .kunde-card:hover {
+    transform: scale(1.01);
+}
+
+.reise-header, .kunde-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reise-card h3, .kunde-card h3 {
     color: #007bff;
+    margin-top: 0;
 }
 
-.reise-card ul {
+.reise-card p, .kunde-card p {
+    margin: 10px 0;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    font-size: 16px;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.toggle-button.rotated {
+    transform: rotate(180deg);
+}
+
+.reise-card ul, .kunde-card ul {
     list-style: none;
     padding: 0;
+    margin-top: 10px;
 }
 
-.reise-card ul li {
+.reise-card ul li, .kunde-card ul li {
     padding: 5px;
     background: #f8f9fa;
     margin: 5px 0;
     border-left: 4px solid #007bff;
     padding-left: 10px;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .column {
+        width: 100%;
+    }
 }

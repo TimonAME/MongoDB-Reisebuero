@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
 
 const app = express();
@@ -34,6 +34,7 @@ app.get('/reisen', async (req, res) => {
         }).toArray();
         res.json(reisen);
     } catch (error) {
+        console.error("Fehler beim Abrufen der Reisen:", error);
         res.status(500).json({ error: "Fehler beim Abrufen der Reisen" });
     }
 });
@@ -41,11 +42,26 @@ app.get('/reisen', async (req, res) => {
 // Kunden und deren gewähltes Reiseangebot basierend auf der Reisenummer abrufen
 app.get('/reisen/:nummer/kunden', async (req, res) => {
     try {
-        const { nummer } = req.params;
+        const nummer = req.params.nummer;
 
-        // Reise mit angegebener Nummer finden
-        const reise = await db.collection("reisen").findOne({ reisenummer: nummer });
+        // Versuche erst mit dem String-Wert
+        let reise = await db.collection("reisen").findOne({ reisenummer: nummer });
+
+        // Wenn nichts gefunden wurde, versuche mit dem Integer-Wert
         if (!reise) {
+            const nummerInt = parseInt(nummer);
+            if (!isNaN(nummerInt)) {
+                reise = await db.collection("reisen").findOne({ reisenummer: nummerInt });
+            }
+        }
+
+        // Wenn immer noch nichts gefunden wurde, suche nach _id wenn es ein gültiger ObjectId ist
+        if (!reise && ObjectId.isValid(nummer)) {
+            reise = await db.collection("reisen").findOne({ _id: new ObjectId(nummer) });
+        }
+
+        if (!reise) {
+            console.log(`Reise mit Nummer ${nummer} nicht gefunden`);
             return res.status(404).json({ error: "Reise nicht gefunden" });
         }
 
@@ -78,8 +94,82 @@ app.get('/reisen/:nummer/kunden', async (req, res) => {
 
         res.json(kundenMitAngebote);
     } catch (error) {
-        console.error(error);
+        console.error("Fehler beim Abrufen der Kunden für Reise:", error);
         res.status(500).json({ error: "Fehler beim Abrufen der Kunden" });
+    }
+});
+
+// Alle Kunden abrufen
+app.get('/kunden', async (req, res) => {
+    try {
+        const kunden = await db.collection("kunden").find({}).toArray();
+        res.json(kunden);
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Kunden:", error);
+        res.status(500).json({ error: "Fehler beim Abrufen der Kunden" });
+    }
+});
+
+// Alle Reisen eines Kunden abrufen
+app.get('/kunden/:id/reisen', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Kunde mit der angegebenen ID finden
+        const kunde = await db.collection("kunden").findOne({
+            _id: new ObjectId(id)
+        });
+
+        if (!kunde) {
+            console.log(`Kunde mit ID ${id} nicht gefunden`);
+            return res.status(404).json({ error: "Kunde nicht gefunden" });
+        }
+
+        // Angebote-IDs des Kunden extrahieren
+        const angebotIDs = kunde.angebotIDs || [];
+
+        // Reisen mit diesen Angeboten finden
+        const reisen = await db.collection("reisen").find({
+            "reiseangebot.angebotID": { $in: angebotIDs }
+        }).toArray();
+
+        // Detaillierte Informationen über die Reisen und gebuchten Angebote zusammenstellen
+        const reisenDetails = [];
+
+        reisen.forEach(reise => {
+            // Nur die Angebote filtern, die der Kunde tatsächlich gebucht hat
+            const gebuchteAngebote = reise.reiseangebot.filter(angebot =>
+                angebotIDs.includes(angebot.angebotID)
+            );
+
+            if (gebuchteAngebote.length > 0) {
+                reisenDetails.push({
+                    reiseID: reise._id,
+                    reisenummer: reise.reisenummer,
+                    reisebezeichnung: reise.reisebezeichnung,
+                    abreiseOrt: reise.abreiseOrt,
+                    ankunftsOrt: reise.ankunftsOrt,
+                    gebuchteAngebote: gebuchteAngebote.map(angebot => ({
+                        angebotID: angebot.angebotID,
+                        angebotbezeichnung: angebot.angebotbezeichnung,
+                        preis: angebot.preis,
+                        datumAbreise: angebot.datumAbreise
+                    }))
+                });
+            }
+        });
+
+        res.json({
+            kunde: {
+                id: kunde._id,
+                Vorname: kunde.Vorname,
+                Nachname: kunde.Nachname
+            },
+            reisen: reisenDetails
+        });
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Reisen des Kunden:", error);
+        res.status(500).json({ error: "Fehler beim Abrufen der Reisen des Kunden" });
     }
 });
 
