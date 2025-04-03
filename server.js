@@ -14,7 +14,7 @@ let db;
 MongoClient.connect(MONGO_URL)
     .then(client => {
         db = client.db(DB_NAME);
-        console.log(`✅ Verbunden mit MongoDB (${DB_NAME})`);
+        console.log(`Verbunden mit MongoDB (${DB_NAME})`);
     })
     .catch(err => console.error("Fehler bei der Verbindung zu MongoDB:", err));
 

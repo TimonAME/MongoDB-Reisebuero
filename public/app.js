@@ -31,10 +31,10 @@ function fetchReisen() {
                             <p><strong>Abreise:</strong> ${reise.abreiseOrt} → ${reise.ankunftsOrt}</p>
                             <p><strong>Reisenummer:</strong> ${reise.reisenummer}</p>
                         </div>
-                        <button class="toggle-button" onclick="toggleTeilnehmer('${reise.reisenummer}')">⬇️</button>
+                        <button class="toggle-button" onclick="toggleTeilnehmer('${reise.reisenummer}')">⬇</button>
                     </div>
                     <ul id="teilnehmer-${reise.reisenummer}" style="display: none;">
-                        <li>🔄 Lade Teilnehmer...</li>
+                        <li>Lade Teilnehmer...</li>
                     </ul>
                 `;
                 container.appendChild(card);
@@ -73,10 +73,10 @@ function fetchKundenListe() {
                         <div>
                             <h3>${kunde.Vorname} ${kunde.Nachname}</h3>
                         </div>
-                        <button class="toggle-button" onclick="toggleKundeReisen('${kunde._id}')">⬇️</button>
+                        <button class="toggle-button" onclick="toggleKundeReisen('${kunde._id}')">⬇</button>
                     </div>
                     <ul id="kunde-reisen-${kunde._id}" style="display: none;">
-                        <li>🔄 Lade gebuchte Reisen...</li>
+                        <li>Lade gebuchte Reisen...</li>
                     </ul>
                 `;
                 container.appendChild(card);
