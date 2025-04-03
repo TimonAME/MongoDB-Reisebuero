@@ -4,9 +4,9 @@ const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017";
-const DB_NAME = "Reisebüro";
+const PORT = process.env.PORT;
+const MONGO_URL = process.env.MONGO_URL;
+const DB_NAME = process.env.DB_NAME;
 
 let db;
 
