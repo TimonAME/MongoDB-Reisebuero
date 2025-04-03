@@ -159,14 +159,7 @@ app.get('/kunden/:id/reisen', async (req, res) => {
             }
         });
 
-        res.json({
-            kunde: {
-                id: kunde._id,
-                Vorname: kunde.Vorname,
-                Nachname: kunde.Nachname
-            },
-            reisen: reisenDetails
-        });
+        res.json(reisenDetails);
     } catch (error) {
         console.error("Fehler beim Abrufen der Reisen des Kunden:", error);
         res.status(500).json({ error: "Fehler beim Abrufen der Reisen des Kunden" });

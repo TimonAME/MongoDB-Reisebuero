@@ -135,12 +135,12 @@ function fetchKundeReisen(kundeId) {
             const reisenList = document.getElementById(`kunde-reisen-${kundeId}`);
             reisenList.innerHTML = "";
 
-            if (!data.reisen || data.reisen.length === 0) {
+            if (!data || data.length === 0) {
                 reisenList.innerHTML = "<li>Keine gebuchten Reisen</li>";
                 return;
             }
 
-            data.reisen.forEach(reise => {
+            data.forEach(reise => {
                 reise.gebuchteAngebote.forEach(angebot => {
                     const li = document.createElement("li");
                     // Formatiere das Datum, falls es vorhanden ist
